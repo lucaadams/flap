@@ -103,20 +103,20 @@ int main()
 	gateways.reserve(3); // minimise dynamic memory copying + allocations by reserving 3 slots
 
 	// initialise pipe starting locations
-	Pipe topPipe1(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150)/ 2, 0));
-	Pipe bottomPipe1(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2, 1200));
+	Pipe topPipe1(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150)/ 2, 20));
+	Pipe bottomPipe1(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2, 1180));
 	Threshold threshold1(sf::Vector2f(150, DEFAULT_WINDOW_HEIGHT), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2, 600));
 	gateways.emplace_back(topPipe1, bottomPipe1, threshold1);
 
 	int gateway2OffsetY = rand() % 400 - 200;
-	Pipe topPipe2(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 50, 0 + gateway2OffsetY));
-	Pipe bottomPipe2(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 50, 1200 + gateway2OffsetY));
+	Pipe topPipe2(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 50, 20 + gateway2OffsetY));
+	Pipe bottomPipe2(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 50, 1180 + gateway2OffsetY));
 	Threshold threshold2(sf::Vector2f(150, DEFAULT_WINDOW_HEIGHT), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 50, 600));
 	gateways.emplace_back(topPipe2, bottomPipe2, threshold2);
 	
 	int gateway3OffsetY = rand() % 400 - 200;
-	Pipe topPipe3(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + 2 * (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 100, 0 + gateway3OffsetY));
-	Pipe bottomPipe3(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + 2 * (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 100, 1200 + gateway3OffsetY));
+	Pipe topPipe3(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + 2 * (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 100, 20 + gateway3OffsetY));
+	Pipe bottomPipe3(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + 2 * (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 100, 1180 + gateway3OffsetY));
 	Threshold threshold3(sf::Vector2f(150, DEFAULT_WINDOW_HEIGHT), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + 2 * (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 100, 600));
 	gateways.emplace_back(topPipe3, bottomPipe3, threshold3);
 
@@ -310,7 +310,7 @@ int main()
 				// close gates by 20px every time they go off screen to make it more difficult over time
 				if (offScreen)
 				{
-					gateways[i].CloseBy(20);
+					gateways[i].CloseBy(40);
 					if (gatewaySpeed < 900.0f) gatewaySpeed += 10.0f;
 					offScreen = false;
 				}
@@ -323,9 +323,8 @@ int main()
 			for (Gateway gateway : gateways)
 				gateway.Draw(window);
 			scoreText.setString(std::to_string(score));
+			scoreText.setOrigin(scoreText.getLocalBounds().width / 2, scoreText.getLocalBounds().height / 2);
 			window.draw(scoreText);
-			std::cout << view.getSize().x << ", " << view.getSize().y << std::endl;
-			//highScoreText.setPosition(view.getSize().x - 400, highScoreText.getPosition().y);
 			window.draw(highScoreText);
 		}
 
@@ -380,13 +379,13 @@ void InitTexts(
 	scoreText.setFont(font);
 	scoreText.setCharacterSize(50);
 	scoreText.setStyle(sf::Text::Bold);
-	scoreText.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2, 30));
+	scoreText.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2, 50));
 
 	highScoreText.setFont(font);
 	highScoreText.setCharacterSize(24);
 	highScoreText.setString("(best " + std::to_string(highScore) + ")");
 	highScoreText.setOrigin(highScoreText.getLocalBounds().width / 2, highScoreText.getLocalBounds().height / 2);
-	highScoreText.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2 + 20, 110));
+	highScoreText.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2, 110));
 
 	gamePausedText.setFont(font);
 	gamePausedText.setCharacterSize(30);
