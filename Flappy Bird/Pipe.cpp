@@ -18,7 +18,7 @@ void Pipe::MoveX(float speed, int defaultYOffset, int newYOffset, float deltaTim
 		// centre the gateway
 		body.setPosition(sf::Vector2f(body.getPosition().x, defaultYOffset));
 		// move to right side of screen
-		body.move(sf::Vector2f(WINDOW_WIDTH + body.getSize().x, newYOffset));
+		body.move(sf::Vector2f(DEFAULT_WINDOW_WIDTH + body.getSize().x, newYOffset));
 		// set offscreen pointer to true (bc the pipe is offscreen)
 		*offScreen = true;
 	}

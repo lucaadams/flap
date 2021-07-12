@@ -3,11 +3,11 @@
 #include "Consts.h"
 
 Bird::Bird(sf::Texture* texture, sf::Vector2u imageCount, float jumpHeight)
-	: jumpHeight(jumpHeight), startPosition(sf::Vector2f(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2)), row(0), velocityY(0.0f), alreadyJumped(false)
+	: jumpHeight(jumpHeight), startPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 4, DEFAULT_WINDOW_HEIGHT / 2)), row(0), velocityY(0.0f), alreadyJumped(false)
 {
 	body.setSize(sf::Vector2f(150.0f, 106.0f));
 	body.setOrigin(body.getSize() / 2.0f);
-	body.setPosition(sf::Vector2f(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2));
+	body.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 4, DEFAULT_WINDOW_HEIGHT / 2));
 	
 	body.setTexture(texture);
 	textureRect.width = texture->getSize().x / float(imageCount.x);

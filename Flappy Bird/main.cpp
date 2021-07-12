@@ -28,6 +28,14 @@ const char* highScoreFilePath = "../savedata/HighScore.txt";
 //	return malloc(size);
 //}
 
+void ResizeView(const sf::RenderWindow& window, sf::View& view)
+{
+	float aspectRatio = (float)window.getSize().x / (float)window.getSize().y;
+	view.setSize(DEFAULT_WINDOW_HEIGHT * aspectRatio, DEFAULT_WINDOW_HEIGHT);
+}
+
+void InitSideBars(sf::RectangleShape& leftSideBar, sf::RectangleShape& rightSideBar);
+
 void InitTexts(
 	sf::Text& welcomeText, sf::Text& pressEnterText, sf::Text& scoreText, sf::Text& highScoreText, unsigned int& highScore, 
 	sf::Text& gamePausedText, sf::Text& pressEscText, const sf::Font& font
@@ -42,7 +50,8 @@ void ResetGame(Bird& bird, std::vector<Gateway>& gateways, float& gatewaySpeed, 
 		highScoreFile << score;
 		highScoreFile.close();
 		highScore = score;
-		highScoreText.setString("high score: " + std::to_string(highScore));
+		highScoreText.setString("(best " + std::to_string(highScore) + ")");
+		highScoreText.setOrigin(highScoreText.getLocalBounds().width / 2, highScoreText.getLocalBounds().height / 2);
 	}
 
 	//for (unsigned int i = 0; i < activeParticleSets.size(); i++)
@@ -62,7 +71,10 @@ int main()
 {
 	GameState gameState = GameState::Menu;
 
-	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "flap", sf::Style::Close /*| sf::Style::Resize | sf::Style::Fullscreen*/);
+	sf::RenderWindow window(sf::VideoMode(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), "flap", sf::Style::Close | sf::Style::Resize /*| sf::Style::Fullscreen*/);
+
+	//float viewHeight = DEFAULT_WINDOW_HEIGHT;
+	sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
 
 	sf::Sprite background;
 	sf::Texture backgroundTexture;
@@ -71,9 +83,13 @@ int main()
 	background.setColor(sf::Color(210, 162, 255, 255));
 	sf::Vector2u backgroundTextureSize = backgroundTexture.getSize();
 
-	Boundary topBoundary(sf::Vector2f(WINDOW_WIDTH, 30), sf::Vector2f(WINDOW_WIDTH / 2, -30));
-	Boundary bottomBoundary(sf::Vector2f(WINDOW_WIDTH, 30), sf::Vector2f(WINDOW_WIDTH / 2, WINDOW_HEIGHT + 30));
-	
+	Boundary topBoundary(sf::Vector2f(DEFAULT_WINDOW_WIDTH, 30), sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2, -30));
+	Boundary bottomBoundary(sf::Vector2f(DEFAULT_WINDOW_WIDTH, 30), sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2, DEFAULT_WINDOW_HEIGHT + 30));
+
+	sf::RectangleShape leftSideBar;
+	sf::RectangleShape rightSideBar;
+	InitSideBars(leftSideBar, rightSideBar);
+
 	sf::Texture* birdTexture = new sf::Texture;
 	birdTexture->loadFromFile("../assets/bird.png");
 	Bird bird(birdTexture, sf::Vector2u(1, 2), 100.0f);
@@ -87,29 +103,29 @@ int main()
 	gateways.reserve(3); // minimise dynamic memory copying + allocations by reserving 3 slots
 
 	// initialise pipe starting locations
-	Pipe topPipe1(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((WINDOW_WIDTH + 2 * 150)/ 2, 0));
-	Pipe bottomPipe1(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((WINDOW_WIDTH + 2 * 150) / 2, 1200));
-	Threshold threshold1(sf::Vector2f(150, WINDOW_HEIGHT), sf::Vector2f((WINDOW_WIDTH + 2 * 150) / 2, 600));
+	Pipe topPipe1(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150)/ 2, 0));
+	Pipe bottomPipe1(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2, 1200));
+	Threshold threshold1(sf::Vector2f(150, DEFAULT_WINDOW_HEIGHT), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2, 600));
 	gateways.emplace_back(topPipe1, bottomPipe1, threshold1);
 
 	int gateway2OffsetY = rand() % 400 - 200;
-	Pipe topPipe2(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((WINDOW_WIDTH + 2 * 150) / 2 + (WINDOW_WIDTH + 2 * 150) / 3 - 50, 0 + gateway2OffsetY));
-	Pipe bottomPipe2(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((WINDOW_WIDTH + 2 * 150) / 2 + (WINDOW_WIDTH + 2 * 150) / 3 - 50, 1200 + gateway2OffsetY));
-	Threshold threshold2(sf::Vector2f(150, WINDOW_HEIGHT), sf::Vector2f((WINDOW_WIDTH + 2 * 150) / 2 + (WINDOW_WIDTH + 2 * 150) / 3 - 50, 600));
+	Pipe topPipe2(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 50, 0 + gateway2OffsetY));
+	Pipe bottomPipe2(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 50, 1200 + gateway2OffsetY));
+	Threshold threshold2(sf::Vector2f(150, DEFAULT_WINDOW_HEIGHT), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 50, 600));
 	gateways.emplace_back(topPipe2, bottomPipe2, threshold2);
 	
 	int gateway3OffsetY = rand() % 400 - 200;
-	Pipe topPipe3(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((WINDOW_WIDTH + 2 * 150) / 2 + 2 * (WINDOW_WIDTH + 2 * 150) / 3 - 100, 0 + gateway3OffsetY));
-	Pipe bottomPipe3(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((WINDOW_WIDTH + 2 * 150) / 2 + 2 * (WINDOW_WIDTH + 2 * 150) / 3 - 100, 1200 + gateway3OffsetY));
-	Threshold threshold3(sf::Vector2f(150, WINDOW_HEIGHT), sf::Vector2f((WINDOW_WIDTH + 2 * 150) / 2 + 2 * (WINDOW_WIDTH + 2 * 150) / 3 - 100, 600));
+	Pipe topPipe3(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + 2 * (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 100, 0 + gateway3OffsetY));
+	Pipe bottomPipe3(pipeTexture, sf::Vector2f(150, 800), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + 2 * (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 100, 1200 + gateway3OffsetY));
+	Threshold threshold3(sf::Vector2f(150, DEFAULT_WINDOW_HEIGHT), sf::Vector2f((DEFAULT_WINDOW_WIDTH + 2 * 150) / 2 + 2 * (DEFAULT_WINDOW_WIDTH + 2 * 150) / 3 - 100, 600));
 	gateways.emplace_back(topPipe3, bottomPipe3, threshold3);
 
-	const unsigned int particleSetLength = 10;
+	const unsigned int particleSetLength = 15;
 	std::vector<Particle*> activeParticleSets;
 	activeParticleSets.reserve(5);
 
 	sf::Texture particleTexture;
-	particleTexture.loadFromFile("../assets/particle2.png");
+	particleTexture.loadFromFile("../assets/particle.png");
 
 	std::fstream highScoreFile;
 	unsigned int highScore;
@@ -182,10 +198,14 @@ int main()
 			case sf::Event::Closed:
 				window.close();
 				break;
+			case sf::Event::Resized:
+				ResizeView(window, view);
 			default:
 				break;
 			}
 		}
+
+		view.setCenter(sf::Vector2f(bird.GetPosition().x * 2, DEFAULT_WINDOW_HEIGHT / 2));
 
 		window.clear();
 		window.draw(background);
@@ -304,6 +324,8 @@ int main()
 				gateway.Draw(window);
 			scoreText.setString(std::to_string(score));
 			window.draw(scoreText);
+			std::cout << view.getSize().x << ", " << view.getSize().y << std::endl;
+			//highScoreText.setPosition(view.getSize().x - 400, highScoreText.getPosition().y);
 			window.draw(highScoreText);
 		}
 
@@ -319,8 +341,24 @@ int main()
 			window.draw(pressEscText);
 		}
 
+		window.draw(leftSideBar);
+		window.draw(rightSideBar);
+		window.setView(view);
 		window.display();
 	}
+}
+
+void InitSideBars(sf::RectangleShape& leftSideBar, sf::RectangleShape& rightSideBar)
+{
+	leftSideBar.setSize(sf::Vector2f(1000, DEFAULT_WINDOW_HEIGHT));
+	leftSideBar.setOrigin(leftSideBar.getSize() / 2.0f);
+	leftSideBar.setPosition(sf::Vector2f(-500, DEFAULT_WINDOW_HEIGHT / 2));
+	leftSideBar.setFillColor(sf::Color(0, 0, 0, 255));
+	
+	rightSideBar.setSize(sf::Vector2f(1000, DEFAULT_WINDOW_HEIGHT));
+	rightSideBar.setOrigin(rightSideBar.getSize() / 2.0f);
+	rightSideBar.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH + 500, DEFAULT_WINDOW_HEIGHT / 2));
+	rightSideBar.setFillColor(sf::Color(0, 0, 0, 255));
 }
 
 void InitTexts(
@@ -330,30 +368,35 @@ void InitTexts(
 	welcomeText.setFont(font);
 	welcomeText.setCharacterSize(30);
 	welcomeText.setString("welcome to flap");
-	welcomeText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2 - 255, 100));
+	welcomeText.setOrigin(welcomeText.getLocalBounds().width / 2, welcomeText.getLocalBounds().height / 2);
+	welcomeText.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2, 100));
 
 	pressEnterText.setFont(font);
 	pressEnterText.setCharacterSize(24);
 	pressEnterText.setString("press enter to begin");
-	pressEnterText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2 - 270, WINDOW_HEIGHT / 2 - 100));
+	pressEnterText.setOrigin(pressEnterText.getLocalBounds().width / 2, pressEnterText.getLocalBounds().height / 2);
+	pressEnterText.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2, DEFAULT_WINDOW_HEIGHT / 2 - 100));
 
 	scoreText.setFont(font);
 	scoreText.setCharacterSize(50);
 	scoreText.setStyle(sf::Text::Bold);
-	scoreText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2, 30));
+	scoreText.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2, 30));
 
 	highScoreText.setFont(font);
 	highScoreText.setCharacterSize(24);
-	highScoreText.setString("high score: " + std::to_string(highScore));
-	highScoreText.setPosition(sf::Vector2f(WINDOW_WIDTH - 400, 30));
+	highScoreText.setString("(best " + std::to_string(highScore) + ")");
+	highScoreText.setOrigin(highScoreText.getLocalBounds().width / 2, highScoreText.getLocalBounds().height / 2);
+	highScoreText.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2 + 20, 110));
 
 	gamePausedText.setFont(font);
 	gamePausedText.setCharacterSize(30);
 	gamePausedText.setString("game paused");
-	gamePausedText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2 - 200, 100));
+	gamePausedText.setOrigin(gamePausedText.getLocalBounds().width / 2, gamePausedText.getLocalBounds().height / 2);
+	gamePausedText.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2, 100));
 
 	pressEscText.setFont(font);
 	pressEscText.setCharacterSize(24);
 	pressEscText.setString("press esc to resume");
-	pressEscText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2 - 260, WINDOW_HEIGHT / 2 - 100));
+	pressEscText.setOrigin(pressEscText.getLocalBounds().width / 2, pressEscText.getLocalBounds().height / 2);
+	pressEscText.setPosition(sf::Vector2f(DEFAULT_WINDOW_WIDTH / 2, DEFAULT_WINDOW_HEIGHT / 2 - 100));
 }
