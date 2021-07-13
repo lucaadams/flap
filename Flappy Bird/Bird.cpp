@@ -32,6 +32,17 @@ void Bird::Update(float deltaTime, bool& jumped)
 
 	velocityY += GRAVITY * deltaTime;
 
+	// manage rotation over various velocities
+	if (velocityY < -700)
+		body.setRotation(-17.5f);
+	else if (velocityY > 1400)
+		body.setRotation(35.0f);
+	else if (velocityY < -500)
+		body.setRotation(velocityY / 60.0f);
+	else
+		body.setRotation(velocityY / 40.0f);
+
+	// switch animation rect row depending if the bird is going up or down
 	if (velocityY > 0.0f)
 		row = 0;
 	else
