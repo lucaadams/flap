@@ -33,12 +33,12 @@ void Bird::Update(float deltaTime, bool& jumped)
 	velocityY += GRAVITY * deltaTime;
 
 	// manage rotation over various velocities
-	if (velocityY < -700)
-		body.setRotation(-17.5f);
+	if (velocityY < -800)
+		body.setRotation(-20.0f);
 	else if (velocityY > 1400)
 		body.setRotation(35.0f);
-	else if (velocityY < -500)
-		body.setRotation(velocityY / 60.0f);
+	//else if (velocityY < -500)
+	//	body.setRotation(velocityY / 60.0f);
 	else
 		body.setRotation(velocityY / 40.0f);
 

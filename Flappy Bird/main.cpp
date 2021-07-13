@@ -5,7 +5,6 @@
 #include <direct.h>
 #include <filesystem>
 #include <vector>
-#include <array>
 #include <string>
 #include "Bird.h"
 #include "Pipe.h"
@@ -16,8 +15,6 @@
 #include "Particle.h"
 #include "Consts.h"
 
-#include <iostream>
-
 enum class GameState { Menu = 0, Playing, Paused };
 
 const char* highScoreFilePath = "../savedata/HighScore.txt";
@@ -26,6 +23,12 @@ const char* highScoreFilePath = "../savedata/HighScore.txt";
 //{
 //	printf("allocating %d bytes", size);
 //	return malloc(size);
+//}
+
+//void operator delete[](void* pointer)
+//{
+//	printf("deallocating");
+//	return free(pointer);
 //}
 
 void ResizeView(const sf::RenderWindow& window, sf::View& view)
@@ -92,7 +95,7 @@ int main()
 
 	sf::Texture* birdTexture = new sf::Texture;
 	birdTexture->loadFromFile("../assets/bird.png");
-	Bird bird(birdTexture, sf::Vector2u(1, 2), 100.0f);
+	Bird bird(birdTexture, sf::Vector2u(1, 2), 150.0f);
 
 	sf::Texture* pipeTexture = new sf::Texture;
 	pipeTexture->loadFromFile("../assets/pipe.png");
@@ -122,7 +125,7 @@ int main()
 
 	const unsigned int particleSetLength = 15;
 	std::vector<Particle*> activeParticleSets;
-	activeParticleSets.reserve(5);
+	activeParticleSets.reserve(5); // save 5 slots for particle sets
 
 	sf::Texture particleTexture;
 	particleTexture.loadFromFile("../assets/particle.png");
@@ -132,6 +135,7 @@ int main()
 	highScoreFile.open(highScoreFilePath, std::ios::in);
 	if (!highScoreFile)
 	{
+		_mkdir("../savedata");
 		std::ofstream newHighScoreFile { highScoreFilePath };
 		newHighScoreFile.close();
 		highScore = 0;
