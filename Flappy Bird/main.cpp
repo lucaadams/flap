@@ -340,6 +340,9 @@ int main()
 				timeSinceLastEsc = 0.0f;
 				continue;
 			}
+			bird.Draw(window);
+			for (Gateway gateway : gateways)
+				gateway.Draw(window);
 			window.draw(gamePausedText);
 			window.draw(pressEscText);
 		}
